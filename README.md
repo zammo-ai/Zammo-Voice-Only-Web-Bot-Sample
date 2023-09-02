@@ -2,9 +2,9 @@
 
 ## Important Note
 
-To understand (or use) this sample, you need to be familiar with [Zammo](https://zammo.ai/) (and ideally have an instance provisioned).
+To understand (or use) this sample, you'll need to be familiar with [Zammo](https://zammo.ai/) (and preferably have an instance provisioned).
 
-If this is not the case and you are interested in learning more, you can contact the Zammo team by using the form at the bottom of this [web page](https://zammo.ai/).
+If this is not the case and you are interested in learning more, you can contact the Zammo team using the form at the bottom of this [web page](https://zammo.ai/).
 
 ## Description
 
@@ -23,9 +23,9 @@ This integration combines the benefits of the voice bot (which can be easier and
 
 #### Feedback Companion
 
-When conducting research or surveys projects, this integration can be very useful for providing a way for participants to share feedback.
+When conducting research or survey projects, this integration can be very useful for providing a way for participants to share feedback.
 
-As speaking is faster than typing, it enables participants to go through more questions as they can do so hands-free, and from many devices (including their phones).
+As speaking is faster than typing, it enables participants to go through more questions as they can do so hands-free and from many devices (including their phones).
 
 #### Voice Assistant | IVR Prototype
 
@@ -68,14 +68,14 @@ To do this, perform the following steps:
 
 Update the sample.HTML page with your credentials in the corresponding section marked with the `<!-- ZAMMO CONFIGURATION SCRIPT -->` and fill in the details from the Zammo bot credentials in the corresponding section.
 
-Host the sample.html file on any web servers capable of serving static content. Some options:
+Host the sample.html file on any web server capable of serving static content. Some options:
 
 - [Using Azure storage account](https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blob-static-website-how-to?tabs=azure-portal)
 - [Using a local http-server](https://github.com/http-party/http-server)
 
 ## Demo
 
-https://github.com/zammo-ai/Zammo/assets/4819282/43bd5674-20ae-48a2-ae7c-95164f6273cb
+https://github.com/zammo-ai/Zammo-Voice-Only-Web-Bot-Sample/assets/4819282/fe688469-89aa-4dea-9c99-57f7166c5b9e
 
 ## Libraries
 
@@ -91,14 +91,14 @@ The sample makes use of the following open-source libraries:
 
 ## Integration into Your Product
 
-You can use the code to enable your Zammo build bot as a standalone application or by importing it into your application.
+You can use the code to enable your Zammo build bot as a standalone application or import it into your application.
 
-When importing into your own application, you can also export the section under `<!-- APP SCRIPT -->`, and you can adjust or replace any elements to match your branding guidelines.
+When importing into your application, you can also export the section under `<!-- APP SCRIPT -->`, and you can adjust or replace any elements to match your branding guidelines.
 
 Some of the key functions are:
 
 - `initializeBot`: which initializes the connection to the bot.
-- `processWebSocketMessage`: which allows you to customize how you process the bot response.
+- `processWebSocketMessage` allows you to customize how you process the bot response.
 
 ### Specificities
 
@@ -108,25 +108,25 @@ Some of the key functions are:
 
 On mobile, there is an additional restriction in which audio needs to be played right after the action to allow the app to play audio later in any asynchronous part.
 
-When making changes, you will need to ensure that these two requirements are met; otherwise, you may experience issues where no sound will be played for the bot prompt.
+When making changes, you must ensure these two requirements are met; otherwise, you may experience issues where no sound will be played for the bot prompt.
 
 In the sample, we display a modal to inform the user that the application accesses the microphone. When the user approves, we play a short silence which helps meet the two criteria.
 
 #### Troubleshooting on Mobile
 
-When troubleshooting on mobile, it can be difficult to access the console to view error messages. The sample has [Eruda](https://github.com/liriliri/eruda) imported that you can turn on by passing a query argument `debug` to the URL where you host the sample.
+When troubleshooting on mobile, accessing the console to view error messages can be complex. The sample has [Eruda](https://github.com/liriliri/eruda) imported that you can turn on by passing a query argument `debug` to the URL where you host the sample.
 
 You can then add additional `console.log` to the sample and view the debug on mobile or any other device.
 
 ### Notes
 
-We recommend ensuring that your changes align with [accessibility standards](https://www.w3.org/WAI/standards-guidelines/wcag/).
+We recommend ensuring your changes align with [accessibility standards](https://www.w3.org/WAI/standards-guidelines/wcag/).
 
 ## Contribution
 
 Zammo does not accept direct contributions to this repository, but our team would love to get your feedback. The primary channel for sending your feedback will be to use the form on our [website](https://zammo.ai).
 
-If you are already a Zammo customer, please engage with our Customer Success teams or your account manager.
+If you are already a Zammo customer, don't hesitate to get in touch with our Customer Success teams or your account manager.
 
 ## License
 
