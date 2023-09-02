@@ -1,0 +1,7 @@
+## Ignore mac generated files
+
+/**/.DS_Store
+
+## Ignore visual studio configuration
+
+/.vscode

@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Zammo Bot Voice Only Application</title>
+    <style>
+      body p {
+        font-family: Montserrat;
+      }
+      .zammo-voice-app {
+        display: flex;
+        background-color: #fefefe;
+        flex-direction: column;
+        display: none;
+      }
+
+      .zammo-voice-app--control-buttons {
+        display: flex;
+        -webkit-box-pack: end;
+        justify-content: flex-end;
+        margin: 1rem 1rem 0px 0px;
+      }
+
+      .zammo-voice-app--control-buttons span {
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        font-size: 2rem;
+        color: rgb(0, 140, 255);
+        display: flex;
+        -webkit-box-align: center;
+        align-items: center;
+        -webkit-box-pack: center;
+        justify-content: center;
+      }
+
+      .zammo-voice-app--control-buttons span.deactivated {
+        color: rgb(255, 0, 116);
+      }
+
+      .zammo-voice-app--voice-device {
+        max-width: 425px;
+        width: 100%;
+        margin: auto;
+        border: 5px solid rgb(0, 0, 0);
+        border-radius: 10px;
+        position: relative;
+        text-align: center;
+        height: calc(100vh - 150px);
+        padding-top: 2rem;
+        overflow: hidden;
+        padding-left: 1rem;
+        padding-right: 1rem;
+
+        display: flex;
+        flex-direction: column;
+      }
+
+      .zammo-voice-app--footer {
+        display: flex;
+        flex-direction: row;
+      }
+
+      .zammo-voice-app--footer {
+        margin-top: 4%;
+      }
+
+      .zammo-voice-app--footer p {
+        width: 80%;
+        margin: auto;
+        text-align: center;
+      }
+
+      .zammo-voice-app--voice-device--transcription {
+        height: 100%;
+        max-height: calc(100% - 180px);
+        overflow-y: auto;
+        display: flex;
+      }
+
+      .zammo-voice-app--voice-device--transcription p {
+        font-size: 2rem;
+        line-height: 1.4;
+        text-align: left;
+        margin: auto;
+      }
+
+      .zammo-voice-app--voice-device--microphone {
+        position: absolute;
+        bottom: 20px;
+        left: 0px;
+        right: 0px;
+        margin-top: 3rem;
+      }
+
+      .zammo-voice-app--voice-device--microphone--icon {
+        display: flex;
+        width: 100px;
+        height: 100px;
+        -webkit-box-pack: center;
+        justify-content: center;
+        -webkit-box-align: center;
+        align-items: center;
+        margin: auto;
+        padding-bottom: 20px;
+      }
+
+      .zammo-voice-app--voice-device--microphone--icon i {
+        font-size: xxx-large;
+        background-color: rgb(5, 160, 209);
+        border-radius: 50%;
+        padding: 20%;
+        color: white;
+        cursor: pointer;
+      }
+
+      .zammo-voice-app--voice-device--microphone--sound-bar {
+        display: flex;
+        -webkit-box-pack: center;
+        justify-content: center;
+        height: 10px;
+        width: calc(100% - 40px);
+        margin: 0px 20px;
+        background: rgb(5, 160, 209);
+      }
+
+      .zammo-voice-app--voice-device--microphone--sound-bar--loudness {
+        height: 100%;
+        width: 0%;
+        background: rgb(70, 211, 255);
+        transition: width 0.2s ease 0s;
+      }
+
+      .lds-ring {
+        display: contents;
+        position: relative;
+        width: 80px;
+        height: 80px;
+        display: none;
+      }
+      .lds-ring div {
+        box-sizing: border-box;
+        display: block;
+        position: absolute;
+        width: 64px;
+        height: 64px;
+        margin: 8px;
+        border: 8px solid #fff;
+        border-radius: 50%;
+        animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+        border-color: #fff transparent transparent transparent;
+      }
+      .lds-ring div:nth-child(1) {
+        animation-delay: -0.45s;
+      }
+      .lds-ring div:nth-child(2) {
+        animation-delay: -0.3s;
+      }
+      .lds-ring div:nth-child(3) {
+        animation-delay: -0.15s;
+      }
+      @keyframes lds-ring {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="zammo-voice-app">
+      <div class="zammo-voice-app--control-buttons">
+        <span
+          class="material-icons zammo-voice-app--control-buttons--closed-captions"
+          >closed_caption</span
+        >
+      </div>
+      <div class="zammo-voice-app--voice-device">
+        <div class="zammo-voice-app--voice-device--transcription">
+          <p></p>
+        </div>
+        <div class="zammo-voice-app--voice-device--microphone">
+          <div class="zammo-voice-app--voice-device--microphone--icon">
+            <i class="material-icons">mic</i>
+            <div class="lds-ring">
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
+            </div>
+          </div>
+          <div class="zammo-voice-app--voice-device--microphone--sound-bar">
+            <div
+              class="zammo-voice-app--voice-device--microphone--sound-bar--loudness"
+            ></div>
+          </div>
+        </div>
+      </div>
+      <div class="zammo-voice-app--footer">
+        <p><a href="#">Terms of use</a> | <a href="#">Privacy policy</a></p>
+      </div>
+    </div>
+
+    <!-- PARAMETER BASE SCRIPT -->
+    <!-- LIBRARIES -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-base64@3.7.5/base64.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+
+    <!-- ZAMMO CONFIGURATION SCRIPT -->
+    <script
+      id="ZammoBotUIKitScript"
+      src=""
+      cssUrl=""
+      zammoApiBaseUrl=""
+      unbranded
+      shouldShowMicrophone="true"
+      shouldShowExtensionMenu="true"
+      shouldDisableBargeIn="true"
+      executionType="controlled"
+      webChatId=""
+    ></script>
+
+    <!-- APP SCRIPT -->
+    <script>
+      function main(debug) {
+        if (!window.ZammoBotUIKit) {
+          console.error(
+            "Please ensure that the Zammo script has been imported and is available before this script"
+          );
+
+          return;
+        }
+          window.ZammoBotUIKit.onDocumentReady(function () {
+          var zammoBotUIInstance; // variable will track the instance of Zammo during the session.
+          var audioPlayer; // will track the pkayers that speak the voice bot.
+
+          /**
+           * This function list the audio device sources
+           * It is helpful when troubleshooting potential sounds mismatch.
+          */
+          function listDevices() {
+            if (navigator) {
+                navigator.mediaDevices
+                .enumerateDevices()
+                .then((devices) => {
+                  devices.forEach((device) => {
+                    console.log(`${device.kind}: ${device.label} id = ${device.deviceId}`);
+                  });
+                })
+                .catch((err) => {
+                  console.error(`${err.name}: ${err.message}`);
+                });
+            } else {
+              console.warn('no access to navigator mediaDevices');
+            }
+          }
+
+          /**  -------------------------------- BOT Voice Audio Controller functions -------------------------------- **/
+          function stopAudioPlayer() {
+            if (audioPlayer) {
+              audioPlayer.pause();
+            }
+          }
+
+          function resumeAudioPlayer() {
+            if (audioPlayer) {
+              audioPlayer.play();
+            }
+          }
+
+          /**  -------------------------------- UI updates functions -------------------------------- **/
+
+          /**
+           * This function update the transcription section with the given text.
+           * @param {string} textToAddToTheTranscriptionDiv the text that we want to add to the transcription section of the UI.
+           * @param {string} color the color of the text to display in the transcription section.
+           */
+          function updateTranscriptionDiv(textToAddToTheTranscriptionDiv, color, useHTML) {
+            var transcriptionDiv = document.querySelector(
+              ".zammo-voice-app--voice-device--transcription p"
+            );
+
+            if (window.ZammoBotUIKit.isNullOrUndefined(color)) {
+              color = "black";
+            }
+
+            if (transcriptionDiv) {
+              transcriptionDiv.style.color = color;
+              if (useHTML) {
+                transcriptionDiv.innerHTML = textToAddToTheTranscriptionDiv;
+              } else {
+                transcriptionDiv.textContent = textToAddToTheTranscriptionDiv;
+              }
+            }
+          }
+
+          /**
+           * @param {string} base64Audio a base 64 encoded audio (16-bit PCM).
+           * @return {string} the encoded base 64 of the audio file with the silence at the end trimmed.
+           * NOTE: We can use this function to address the issue of Microsoft Speech To Text adding a silence at the end of all the generated files
+           * see
+           * - https://github.com/MicrosoftDocs/azure-docs/issues/47344
+           * - https://github.com/microsoft/cognitive-services-speech-sdk-js/issues/691
+           * - https://github.com/microsoft/cognitive-services-speech-sdk-js/issues/644
+          */
+          function removeSilenceFromEnd(base64Audio) {
+            // Decode base64 to binary data
+            var binaryAudio = atob(base64Audio);
+
+            // Create an Int16Array from the binary data (assuming 16-bit PCM)
+            var audioSamples = new Int16Array(binaryAudio.length / 2);
+            for (let i = 0; i < audioSamples.length; i++) {
+              audioSamples[i] = binaryAudio.charCodeAt(i * 2) | (binaryAudio.charCodeAt(i * 2 + 1) << 8);
+            }
+
+            // Find the index where silence starts (adjust threshold as needed)
+            var silenceThreshold = 100; // Adjust this threshold as needed
+            var startIndex = audioSamples.length - 1;
+            for (var i = audioSamples.length - 1; i >= 0; i--) {
+              if (Math.abs(audioSamples[i]) > silenceThreshold) {
+                startIndex = i;
+                break;
+              }
+            }
+
+            // Trim the audio samples
+            var trimmedSamples = audioSamples.subarray(0, startIndex + 1);
+
+            // Encode trimmed audio samples to base64
+            var trimmedBinary = "";
+            for (var sample of trimmedSamples) {
+              trimmedBinary += String.fromCharCode(sample & 0xFF, (sample >> 8) & 0xFF);
+            }
+            var trimmedBase64 = btoa(trimmedBinary);
+
+            return trimmedBase64;
+          }
+
+          /**
+           * The function will handle the bot activity and play and display the activity text and audio when applicable.
+           * @param {BotFrameworkActivity} messageReceivedFromTheSocket an activity received from the bot on the webSocket.
+           */
+          function processWebSocketMessage(messageReceivedFromTheSocket) {
+            var isMessageFromTheUser =
+              messageReceivedFromTheSocket.from &&
+              messageReceivedFromTheSocket.from.role === "user";
+            var isATextMessage = messageReceivedFromTheSocket.type === "message";
+            var isBeginVoiceInput =
+              messageReceivedFromTheSocket.type === "BeginVoiceInput";
+            if (!isMessageFromTheUser && (isATextMessage || isBeginVoiceInput)) {
+              var transcriptionDivTextContent = messageReceivedFromTheSocket.text;
+              var useHTML = false;
+              if (messageReceivedFromTheSocket.channelData && messageReceivedFromTheSocket.channelData.TextMessages && messageReceivedFromTheSocket.channelData.TextMessages.length > 0) {
+                useHTML = true;
+                transcriptionDivTextContent = messageReceivedFromTheSocket.channelData.TextMessages.join('<br />');
+              }
+
+              updateTranscriptionDiv(transcriptionDivTextContent, undefined, useHTML);
+
+              if (isBeginVoiceInput) {
+                zammoBotUIInstance.shouldRecordUserInput = true;
+              }
+
+              if (
+                messageReceivedFromTheSocket.channelData &&
+                messageReceivedFromTheSocket.channelData.Audio &&
+                !zammoBotUIInstance.isProcessingMicrophoneInput
+              ) {
+                stopAudioPlayer();
+
+                // we reset the source to play any new media as the audioplayer was initialized as soon 
+                // as the user authorized the microphone.
+                audioPlayer.src = "data:audio/wav;base64," + removeSilenceFromEnd(messageReceivedFromTheSocket.channelData.Audio);
+                audioPlayer.play();
+
+                audioPlayer.onended = function () {
+                  setCloseMicrophoneIcon();
+                };
+              }
+            }
+          }
+
+          function getMicrophoneIcon() {
+            return document.querySelector(
+              ".zammo-voice-app--voice-device--microphone--icon i"
+            );
+          }
+
+          function setMicrophoneIcon(e) {
+            var microphoneIcon = getMicrophoneIcon();
+            if (!microphoneIcon) return;
+
+            if (e) e.preventDefault();
+
+            microphoneIcon.style.backgroundColor = "rgb(5, 160, 209)";
+            microphoneIcon.style.color = "white";
+            microphoneIcon.textContent = "mic";
+            microphoneIcon.removeEventListener("click", setMicrophoneIcon);
+            microphoneIcon.addEventListener("click", setCloseMicrophoneIcon);
+
+            zammoBotUIInstance.stopOngoingAudioInputCollection();
+          }
+
+          function setCloseMicrophoneIcon(e) {
+            var microphoneIcon = getMicrophoneIcon();
+            if (!microphoneIcon) return;
+
+            if (e) e.preventDefault();
+
+            stopAudioPlayer();
+
+            microphoneIcon.style.color = "rgb(5, 160, 209)";
+            var loadingSign = document.querySelector(
+              ".zammo-voice-app--voice-device--microphone--icon .lds-ring"
+            );
+            loadingSign.style.display = "contents";
+
+            var collectAudioInputCallbacks = {
+              onBeginSpeechProcessingCb: function () {
+                loadingSign.style.display = "none";
+                microphoneIcon.style.display = "block";
+                microphoneIcon.style.backgroundColor = "rgb(216, 216, 216)";
+                microphoneIcon.textContent = "close";
+                microphoneIcon.removeEventListener(
+                  "click",
+                  setCloseMicrophoneIcon
+                );
+                microphoneIcon.addEventListener("click", setMicrophoneIcon);
+              },
+              onLoudnessUpdate: function (loudnessValue) {
+                var soundBarBrightness = document.querySelector(
+                  ".zammo-voice-app--voice-device--microphone--sound-bar--loudness"
+                );
+                soundBarBrightness.style.width = "" + loudnessValue + "px";
+              },
+              onSpeechProcessingSuccess: function (transcribedText, audio) {
+                setMicrophoneIcon(); // reset the microphone to be ready to be clicked by the user to speak
+                zammoBotUIInstance.sendTextActivityOnSocket(
+                  transcribedText,
+                  audio
+                );
+              },
+              onSpeechProcessingFailure: function () {
+                setMicrophoneIcon();
+              },
+              onRecognizingCb: function (currentlyRecognizedText) {
+                updateTranscriptionDiv(currentlyRecognizedText, "grey");
+              },
+            };
+            zammoBotUIInstance.collectAudioInput(collectAudioInputCallbacks);
+          }
+
+          function setUpUiControls() {
+            var zammoClosedCaptionButton = document.querySelector(
+              ".zammo-voice-app--control-buttons--closed-captions"
+            );
+            if (zammoClosedCaptionButton) {
+              zammoClosedCaptionButton.onclick = function () {
+                zammoClosedCaptionButton.classList.toggle("deactivated");
+                var transcriptionDiv = document.querySelector(
+                  ".zammo-voice-app--voice-device--transcription"
+                );
+
+                if (zammoClosedCaptionButton.classList.contains("deactivated")) {
+                  transcriptionDiv.style.display = "none";
+                } else {
+                  transcriptionDiv.style.display = "flex";
+                }
+              };
+            }
+
+            var microphoneIcon = getMicrophoneIcon();
+            if (microphoneIcon) {
+              microphoneIcon.addEventListener("click", setCloseMicrophoneIcon);
+            }
+          }
+
+          function initializeBot() {
+            var ZammoBotUIKit = window.ZammoBotUIKit;
+            zammoBotUIInstance = ZammoBotUIKit.initialize();
+
+            var uiLessRunCallbacks = {
+              onLoadingDependenciesCompleteCb: function () {
+                var zammoVoiceApp = document.querySelector(".zammo-voice-app");
+                if (zammoVoiceApp) zammoVoiceApp.style.display = "flex";
+
+                setUpUiControls();
+              },
+              onWebSocketMessageReceivedCb: processWebSocketMessage,
+            };
+
+            zammoBotUIInstance.uiLessRun(uiLessRunCallbacks);
+          }
+
+          /** -------------------------------- INITIAL MODALS ON THE PAGE -------------------------------- **/
+
+          /**
+           * This modal will be shown if the user declines to agree with the term of service.
+           */
+          function showDenyModal() {
+            Swal.fire({
+              title: "We are sorry to see you go",
+              html: `
+            <div class="permission-text">
+              <p> Please agree with our terms of use to provide you with our service.</p>
+              <p class="permission-text--modal-note"> refresh this page if you change your mind.</p>
+            </div>
+            `,
+              showConfirmButton: false,
+              showDenyButton: false,
+              allowEscapeKey: false,
+              allowOutsideClick: false,
+            });
+          }
+
+          /**
+           * This function initializes the audioplayer by playing an empty audio.
+           * It fixes an issue with initializing the audio in a playback call that is marked as not allowed
+           * by the mobile browsers.
+          */
+          function playEmptySound() {
+            audioPlayer = new Audio("data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA");
+            audioPlayer.play();
+          }
+          /**
+           * This modal will be shown if the user has provided permission for the Microphone and is ready to start.
+           */
+          function showAuthorizationModal() {
+            Swal.fire({
+              title: "First things first",
+              html: `
+            <div class="permission-text">
+              <p>The speed of your internet connection can greatly impact the picture quality in the call. If you do experience poor quality, we'd love it if you could run a speed test and let us know the results in your feedback when you end the session.</p>
+              <p>I can find it hard to hear you when you're in a noisy room or when other conversations are happening around you. Please call me from a quiet place, and let's keep this one-on-one for now.</p>
+              <p>Ask me a question, and I'll do my best to answer it. If I don't have an answer, I'll do my best to give you a reasonable next step.</p>
+            </div>
+            `,
+
+              confirmButtonAriaLabel: "Accept",
+              confirmButtonText: "Accept",
+              showConfirmButton: true,
+
+              denyButtonAriaLabel: "Deny",
+              denyButtonText: "Deny",
+              showDenyButton: true,
+
+              allowEscapeKey: false,
+              allowOutsideClick: false,
+            }).then(function (modalValue) {
+              if (modalValue && modalValue.isConfirmed) {
+                initializeBot();
+                playEmptySound();
+                listDevices();
+              } else {
+                showDenyModal();
+              }
+            });
+          }
+
+          /**
+           * This modal will be shown if the user has not given permission for the Microphone yet.
+           */
+          function showPermissionModal() {
+            Swal.fire({
+              title: "First things first",
+              html: `
+            <div class="permission-text">
+              <h3>FOR ME TO WORK BEST, I'D LIKE TO BE ABLE TO HEAR YOUR VOICE.</h3>
+              <p>Please authorize the application to use the Microphone.</p>
+              <p class="permission-text--modal-note">You may need to refresh the page after authorizing the microphone.</p>
+            </div>
+            `,
+              showConfirmButton: false,
+              showDenyButton: false,
+              allowEscapeKey: false,
+              allowOutsideClick: false,
+            });
+          }
+
+          /**
+           * request the Microphone's permissions from the user.
+           */
+          function requestMicPermission() {
+            navigator.mediaDevices
+              .getUserMedia({ audio: true })
+              .then(function (stream) {
+                showAuthorizationModal();
+              })
+              .catch(function (err) {});
+          }
+
+          showPermissionModal();
+          requestMicPermission();
+        });
+      }
+
+      //If query params are added to the URL, they will automatically populate the values for src, cssUrl, zammoApiBaseUrl and webchatId
+      /**
+       * @param {string} name the name of the parameter the caller is attempting to retrieve.
+       * @return {string | null} the value for the parameter if the parameter exists.
+      */
+      function getParameterByName(name) {
+          var match = RegExp("[?&]" + name + "=([^&]*)").exec(window.location.search);
+          return match && decodeURIComponent(match[1].replace(/\+/g, " "));
+      }
+
+      /**
+       * The function will attempt to parse query params URL and if not available it will default to the
+       * standard execution.
+       * 
+       * If src, cssUrl are not provided, the script will fail and output a message in the console.
+      */
+      function run() {
+        var src = getParameterByName("src");
+        var cssUrl = getParameterByName("cssUrl");
+        var zammoApiBaseUrl = getParameterByName("zammoApiBaseUrl");
+        var webChatId = getParameterByName("webChatId");
+
+        if (src && cssUrl && zammoApiBaseUrl && webChatId) {
+          var zammoScript = document.querySelector("#ZammoBotUIKitScript");
+          if (zammoScript) {
+            zammoScript.remove();
+            var newZammoScript = document.createElement('script');
+            // Copy all attributes from the existing script to the new script
+            for (var i = 0; i < zammoScript.attributes.length; i++) {
+              var attr = zammoScript.attributes[i];
+              var attrName = attr.name;
+              
+              // Check if the attribute name is not in the list of parameters to exclude
+              if (attrName !== "cssUrl" && attrName !== "zammoApiBaseUrl" && attrName !== "webChatId") {
+                newZammoScript.setAttribute(attrName, attr.value);
+              }
+            }
+            newZammoScript.setAttribute("cssUrl", cssUrl);
+            newZammoScript.setAttribute("zammoApiBaseUrl", zammoApiBaseUrl);
+            newZammoScript.setAttribute("webChatId", webChatId);
+            newZammoScript.src = src;
+            // newZammoScript.type = "text/javascript";
+            newZammoScript.onload = function () {
+              main();
+            };
+
+            var head = document.head || document.getElementsByTagName('head')[0];
+            head.appendChild(newZammoScript);
+          }
+        } else {
+          main();
+        }
+      }
+
+      // debug will allow to have an in-app virtual console.
+      var debug = getParameterByName("debug");
+      if (debug) {
+        eruda.init();
+      }
+
+      run();
+    </script>
+  </body>
+</html>
